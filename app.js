@@ -7,8 +7,8 @@ MongoClient.connect(mongoDbUrl, function(err, db) {
         console.log(err);
         return;
     }
-	console.log("Connected to server.");
-	clearStat(db).then(
+    console.log("Connected to server.");
+    clearStat(db).then(
         result => {
             console.log(result);
             processZips(db).then(
@@ -26,8 +26,7 @@ MongoClient.connect(mongoDbUrl, function(err, db) {
             console.log(error);
             closeMongoDBConnection(db);
         }
-	);
-
+    );
 });
 
 
@@ -40,8 +39,8 @@ let closeMongoDBConnection = (db) => {
 let clearStat = (db) => {
 	return new Promise((resolve, reject) => {
         db.collection('stat').deleteMany({}, function(err, results) {
-        	if (err) {
-        		reject(err);
+            if (err) {
+                reject(err);
 			}
             resolve('Stat data cleared');
         });
@@ -52,41 +51,40 @@ let clearStat = (db) => {
 let processZips = (db) => {
     return new Promise((resolve, reject) => {
         db.collection('zip').find({}, {"_id":1}).each((err, zipCode) => {
-        	if (zipCode == null) {
+            if (zipCode == null) {
                 resolve('Zips precessed');
             } else {
                 findRestaurantsByZip(db, zipCode._id).then(
                     result => {
-                        insertToStat(db, zipCode, result)
-                            .then(
-                                result => {
-                                    console.log('Inserted: ');
-                                    console.dir(result);
-                                },
-                                error => {
-                                    reject(error);
-                                }
-                            );
+                        insertToStat(db, zipCode, result).then(
+                            result => {
+                                console.log('Inserted: ');
+                                console.dir(result);
+                            },
+                            error => {
+                                reject(error);
+                            }
+                        );
                     },
                     error => {
                         reject(error);
                     }
                 );
-			}
-		});
+            }
+        });
     });
 };
 
 
 let findRestaurantsByZip = (db, zipCode) => {
-	return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         db.collection('restaurant').find({"address.zipcode": zipCode}).toArray((err, restaurants) => {
-        	if (err) {
-        		reject(err);
-			}
-			resolve(restaurants);
-		});
-	});
+            if (err) {
+                reject(err);
+            }
+            resolve(restaurants);
+        });
+    });
 };
 
 
@@ -103,5 +101,5 @@ let insertToStat = (db, zip, restaurants) => {
                 reject(error);
             }
         );
-	});
+    });
 };
