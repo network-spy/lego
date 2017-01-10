@@ -41,7 +41,7 @@ let clearStat = (db) => {
         db.collection('stat').deleteMany({}, function(err, results) {
             if (err) {
                 reject(err);
-			}
+            }
             resolve('Stat data cleared');
         });
     });
