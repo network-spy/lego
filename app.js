@@ -53,10 +53,12 @@ let processZips = (db) => {
         db.collection('zip').find({}, {"_id":1}).each((err, zipCode) => {
             if (zipCode == null) {
                 resolve('Zips precessed');
+            } else if (err) {
+                reject(err);
             } else {
                 findRestaurantsByZip(db, zipCode._id).then(
                     result => {
-                        insertToStat(db, zipCode, result).then(
+                        insertToStat(db, zipCode._id, result).then(
                             result => {
                                 console.log('Inserted: ');
                                 console.dir(result);
