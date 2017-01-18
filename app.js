@@ -49,28 +49,20 @@ let clearStat = (db) => {
 
 
 let processZips = (db) => {
+    // create an array for all the find/insert Promises
+    let p = [];
     return new Promise((resolve, reject) => {
         db.collection('zip').find({}, {"_id":1}).each((err, zipCode) => {
             if (zipCode == null) {
-                resolve('Zips precessed');
+                resolve(Promise.all(p).then(() => 'Zips precessed'));
             } else if (err) {
                 reject(err);
             } else {
-                findRestaurantsByZip(db, zipCode._id).then(
-                    result => {
-                        insertToStat(db, zipCode._id, result).then(
-                            result => {
-                                console.log('Inserted: ');
-                                console.dir(result);
-                            },
-                            error => {
-                                reject(error);
-                            }
-                        );
-                    },
-                    error => {
-                        reject(error);
-                    }
+                p.push(
+                    findRestaurantsByZip(db, zipCode._id)
+                        .then(result => insertToStat(db, zipCode._id, result))
+                        .then(result => console.log('Inserted: ', result))
+                        .catch(error => reject(error))
                 );
             }
         });
